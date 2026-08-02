@@ -34,7 +34,7 @@ echo [完成] npm 依赖安装完成
 echo [3/3] 检查本地 vosk 模型...
 if not exist "model.tar.gz" (
   echo 未找到 model.tar.gz，本地离线引擎将不可用（阿里云引擎不受影响）。
-  echo 如需离线识别，请参见 docs\QUICKSTART.md 下载模型。
+  echo 如需离线识别，请参见 ..\docs\QUICKSTART.md 下载模型。
 ) else (
   echo [完成] 本地模型已就绪
 )
@@ -42,6 +42,6 @@ if not exist "model.tar.gz" (
 echo.
 echo ============================================
 echo   安装完成！运行: npm start
-echo   首次使用请先配置 config.json (见 docs\QUICKSTART.md)
+echo   首次使用请先配置 config.json (见 ..\docs\QUICKSTART.md)
 echo ============================================
 pause

@@ -25,6 +25,7 @@
     },
     "files": [
       "src/**/*",
+      "config.json",
       "package.json"
     ],
     "win": {

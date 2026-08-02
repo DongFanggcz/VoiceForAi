@@ -235,6 +235,16 @@ ipcMain.handle("hotkey:get", () => currentHotkey || "CommandOrControl+Shift+V");
 ipcMain.handle("hotkey:set", (event, accel) => registerHotkey(accel));
 
 app.whenReady().then(async () => {
+  if (!app.requestSingleInstanceLock()) {
+    app.quit();
+    return;
+  }
+  app.on("second-instance", () => {
+    if (win) {
+      win.show();
+      win.focus();
+    }
+  });
   await createWindow();
   registerHotkey(loadHotkey() || "CommandOrControl+Shift+V");
 });

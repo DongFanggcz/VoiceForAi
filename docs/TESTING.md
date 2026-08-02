@@ -107,23 +107,33 @@ npm start
 
 ```bash
 cd voice-desktop
-npx electron-builder --win nsis
+node node_modules/electron-builder/out/cli/cli.js --win nsis
 ```
+
+（或 `npm run pack`；网络慢时先配置 `ELECTRON_MIRROR` 和代理）
 
 ### 5.2 产物
 
 - 安装包：`dist/语音输入浮窗 Setup x.x.x.exe`
-- 安装后自动创建**桌面快捷方式**（安装时勾选「创建桌面快捷方式」）
-- 双击桌面快捷方式即可启动
+- 安装后自动创建**桌面快捷方式**与**开始菜单快捷方式**
+- 双击桌面快捷方式即可启动；应用为单实例（重复启动会聚焦已有窗口）
 
 ### 5.3 打包注意事项
 
-- 首次打包会下载 electron 二进制，网络慢时配置 `ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/`
+- 首次打包会下载 electron 二进制，网络慢时配置 `ELECTRON_MIRROR=https://npmmirror.com/mirrors/electron/`，境外源需 `--proxy http://127.0.0.1:7890`
 - 模型文件（`model.tar.gz`、`models/`）较大，未打包进安装包；离线引擎需用户自行放置
-- `config.json`（含密钥）不打包，首次运行需用户自行配置
+- `config.json`（含密钥）**会被打进安装包**（`package.json` 的 `files` 包含它）；分发他人时先删除再打包
+- **Smart App Control 会拦截未签名 exe**：双击无反应时，到「Windows 安全中心 → 应用和浏览器控制」关闭 SAC，或重启电脑；详见 QUICKSTART.md
+
+### 5.4 打包版启动失败排查
+
+1. 双击桌面图标无反应 → 检查是否被 Smart App Control 拦截（见上）
+2. 打开后「连接失败」→ 检查 config.json 凭证、服务是否开通
+3. 重复启动多个 → 新版已加单实例锁，正常只会有一个实例
 
 ## 6. 回归测试记录
 
 | 日期 | 版本 | 结果 | 备注 |
 |------|------|------|------|
-| 2026-08-02 | v1.0 | 见会话归档 | 全链路自测通过（录音→NLS→识别→回传） |
+| 2026-08-02 | v1.0 | ✅ | 开发版全链路自测通过（录音→NLS→识别→回传） |
+| 2026-08-03 | v1.0 | ✅ | 打包版功能正常（SAC 关闭后）；开发版回归通过 |
