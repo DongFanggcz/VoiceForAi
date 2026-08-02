@@ -4,15 +4,44 @@
   "description": "语音转文字置顶浮窗",
   "main": "src/main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "pack": "electron-builder --win nsis"
   },
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^43.2.0"
+    "electron": "^43.2.0",
+    "electron-builder": "^26.0.12"
   },
   "dependencies": {
     "vosk-browser": "^0.0.8",
     "ws": "^8.21.1"
+  },
+  "build": {
+    "appId": "com.voiceinput.desktop",
+    "productName": "语音输入浮窗",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "语音输入浮窗"
+    }
   }
 }

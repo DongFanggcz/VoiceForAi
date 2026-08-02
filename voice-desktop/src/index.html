@@ -3,58 +3,90 @@
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self' http://127.0.0.1:*; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval' blob:; worker-src 'self' blob:; media-src 'self' blob:; connect-src 'self' http://127.0.0.1:*;">
-  <title>语音输入浮窗</title>
+  <title>语音输入</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div id="collapsed" class="collapsed">
+    <button id="cbtn" class="cbtn" title="点击识别，悬停展开">
+      <svg id="cbtn-icon" viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+        <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/>
+        <path d="M17 11a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/>
+      </svg>
+    </button>
+  </div>
+
   <div id="widget" class="widget">
     <div id="titlebar" class="titlebar">
       <span id="dot" class="dot"></span>
-      <span class="title">语音输入</span>
+      <span id="status" class="status">就绪</span>
       <div class="actions">
-        <button id="btn-copy" class="icon-btn" title="复制全部文本">📋</button>
-        <button id="btn-clear" class="icon-btn" title="清空">🗑️</button>
-        <button id="btn-min" class="icon-btn" title="最小化">—</button>
-        <button id="btn-close" class="icon-btn" title="关闭">✕</button>
+        <button id="btn-settings" class="icon-btn" title="设置">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+        <button id="btn-min" class="icon-btn" title="最小化">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+        <button id="btn-close" class="icon-btn" title="关闭">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+        </button>
       </div>
     </div>
 
-    <div class="status-row">
-      <button id="btn-mic" class="mic-btn" title="点击开始/停止语音识别">
-        <svg id="mic-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+    <div class="mic-area">
+      <button id="btn-mic" class="mic-btn" title="点击开始/停止">
+        <svg id="mic-icon" viewBox="0 0 24 24" width="34" height="34" fill="currentColor">
           <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/>
           <path d="M17 11a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/>
         </svg>
       </button>
-      <span id="status" class="status">正在加载模型…</span>
-      <label class="switch" title="识别结束后自动复制">
-        <input type="checkbox" id="chk-autocopy">
-        <span class="slider"></span>
-        <span class="switch-label">自动复制</span>
-      </label>
+      <div class="mic-ring" id="mic-ring"></div>
     </div>
 
-    <div class="row">
-      <label class="top-toggle" title="是否始终置顶">
-        <input type="checkbox" id="chk-top" checked>
-        <span class="slider"></span>
-        <span class="switch-label">置顶</span>
-      </label>
-      <select id="engine" class="lang-select" title="识别引擎">
-        <option value="aliyun">阿里云（在线）</option>
-        <option value="vosk">本地 vosk（离线）</option>
-      </select>
-      <select id="lang" class="lang-select" title="识别语言">
-        <option value="zh-CN">普通话</option>
-        <option value="zh-TW">中文(繁體)</option>
-        <option value="en-US">English</option>
-        <option value="ja-JP">日本語</option>
-        <option value="ko-KR">한국어</option>
-      </select>
+    <div id="output" class="output" contenteditable="true" spellcheck="false" placeholder="点击麦克风说话，识别后自动复制"></div>
+
+    <div class="toolbar">
+      <span class="copied" id="copied">已复制到剪贴板</span>
+      <span class="spacer"></span>
+      <button id="btn-copy" class="tool-btn" title="复制全部">复制</button>
+      <button id="btn-clear" class="tool-btn" title="清空">清空</button>
     </div>
 
-    <div id="output" class="output" contenteditable="true" spellcheck="false" placeholder="识别结果将显示在这里…"></div>
-    <div id="hint" class="hint"></div>
+    <div id="settings" class="settings hidden">
+      <div class="set-row">
+        <label class="set-label">快捷键</label>
+        <span class="set-info hotkey-row" id="hotkey-row" title="点击后按下新组合键">Ctrl+Shift+V</span>
+      </div>
+      <div class="set-row">
+        <label class="set-label">透明度</label>
+        <input type="range" id="rng-opacity" min="40" max="100" value="100">
+        <span id="opacity-val" class="set-val">100%</span>
+      </div>
+      <div class="set-row">
+        <label class="set-label">置顶</label>
+        <label class="mini">
+          <input type="checkbox" id="chk-top" checked>
+          <span>始终置顶</span>
+        </label>
+      </div>
+      <div class="set-row">
+        <label class="set-label">引擎</label>
+        <select id="engine">
+          <option value="aliyun">阿里云（在线）</option>
+          <option value="vosk">本地 vosk（离线）</option>
+        </select>
+      </div>
+      <div class="set-row">
+        <label class="set-label">语言</label>
+        <select id="lang">
+          <option value="zh-CN">普通话</option>
+          <option value="zh-TW">中文(繁體)</option>
+          <option value="en-US">English</option>
+          <option value="ja-JP">日本語</option>
+          <option value="ko-KR">한국어</option>
+        </select>
+      </div>
+    </div>
   </div>
 
   <script src="vosk.js"></script>

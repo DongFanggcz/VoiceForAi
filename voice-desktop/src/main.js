@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow, ipcMain, globalShortcut } = require("electron");
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
@@ -6,9 +6,40 @@ const nls = require("./nls");
 
 let win = null;
 let server = null;
+let currentHotkey = null;
 
-const APP_DIR = path.join(__dirname, "..", "src");
-const MODEL_FILE = path.join(__dirname, "..", "model.tar.gz");
+function loadHotkey() {
+  try {
+    const data = JSON.parse(fs.readFileSync(path.join(app.getPath("userData"), "hotkey.json"), "utf8"));
+    return data.hotkey || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function saveHotkey(hotkey) {
+  try {
+    fs.writeFileSync(path.join(app.getPath("userData"), "hotkey.json"), JSON.stringify({ hotkey }));
+  } catch (e) {}
+}
+
+function registerHotkey(accel) {
+  if (currentHotkey) globalShortcut.unregister(currentHotkey);
+  if (!accel) return false;
+  const ok = globalShortcut.register(accel, () => {
+    if (win) win.webContents.send("hotkey:toggle");
+  });
+  if (ok) {
+    currentHotkey = accel;
+    saveHotkey(accel);
+  }
+  return ok;
+}
+
+const APP_DIR = path.join(app.getAppPath(), "src");
+const MODEL_FILE = app.isPackaged
+  ? path.join(app.getPath("userData"), "model.tar.gz")
+  : path.join(app.getAppPath(), "model.tar.gz");
 
 const MIME = {
   ".html": "text/html; charset=utf-8",
@@ -76,10 +107,10 @@ function startServer() {
 
 function loadWindowState() {
   try {
-    const data = fs.readFileSync(path.join(app.getPath("userData"), "window.json"), "utf8");
-    return JSON.parse(data);
+    const data = JSON.parse(fs.readFileSync(path.join(app.getPath("userData"), "window.json"), "utf8"));
+    return { x: data.x, y: data.y };
   } catch (e) {
-    return { x: undefined, y: undefined, width: 360, height: 340 };
+    return {};
   }
 }
 
@@ -99,11 +130,16 @@ async function createWindow() {
 
   win = new BrowserWindow({
     ...state,
-    minWidth: 320,
-    minHeight: 260,
+    width: 64,
+    height: 64,
+    minWidth: 64,
+    minHeight: 64,
+    maxWidth: 480,
+    maxHeight: 640,
     frame: false,
-    transparent: false,
-    resizable: true,
+    transparent: true,
+    backgroundColor: "#00000000",
+    resizable: false,
     alwaysOnTop: true,
     skipTaskbar: false,
     title: "语音输入浮窗",
@@ -141,6 +177,34 @@ ipcMain.handle("window:toggle-top", (event, top) => {
   return !!top;
 });
 
+ipcMain.on("window:opacity", (event, opacity) => {
+  if (win) win.setOpacity(opacity);
+});
+
+ipcMain.on("window:move", (event, dx, dy) => {
+  if (!win) return;
+  const [x, y] = win.getPosition();
+  win.setPosition(x + dx, y + dy);
+});
+
+ipcMain.on("window:expand", () => {
+  if (!win) return;
+  const [x, y] = win.getPosition();
+  win.setResizable(true);
+  win.setSize(300, 420);
+  const [nx, ny] = win.getPosition();
+  win.setPosition(x - (nx - x), y);
+  win.setResizable(false);
+});
+
+ipcMain.on("window:collapse", () => {
+  if (!win) return;
+  win.setResizable(true);
+  win.setSize(64, 64);
+  win.setResizable(false);
+  saveWindowState();
+});
+
 let transcribeInFlight = null;
 
 ipcMain.handle("nls:start", async (event, payload) => {
@@ -167,13 +231,21 @@ ipcMain.on("nls:stop", () => {
   nls.stopSession();
 });
 
+ipcMain.handle("hotkey:get", () => currentHotkey || "CommandOrControl+Shift+V");
+ipcMain.handle("hotkey:set", (event, accel) => registerHotkey(accel));
+
 app.whenReady().then(async () => {
   await createWindow();
+  registerHotkey(loadHotkey() || "CommandOrControl+Shift+V");
 });
 
 app.on("window-all-closed", () => {
   if (server) server.close();
   app.quit();
+});
+
+app.on("will-quit", () => {
+  globalShortcut.unregisterAll();
 });
 
 app.on("before-quit", () => {
