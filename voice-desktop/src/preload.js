@@ -4,10 +4,11 @@ contextBridge.exposeInMainWorld("desktop", {
   close: () => ipcRenderer.send("window:close"),
   minimize: () => ipcRenderer.send("window:minimize"),
   toggleTop: (top) => ipcRenderer.invoke("window:toggle-top", top),
-  loadWhisper: (modelKey) => ipcRenderer.invoke("whisper:load", modelKey),
-  transcribe: (payload) => ipcRenderer.invoke("whisper:transcribe", payload),
-  onWhisperProgress: (cb) =>
-    ipcRenderer.on("whisper:progress", (e, p) => cb(p)),
-  onWhisperPartial: (cb) =>
-    ipcRenderer.on("whisper:partial", (e, t) => cb(t))
+  nlsStart: (payload) => ipcRenderer.invoke("nls:start", payload),
+  nlsAudio: (payload) => ipcRenderer.send("nls:audio", payload),
+  nlsStop: () => ipcRenderer.send("nls:stop"),
+  onNlsPartial: (cb) => ipcRenderer.on("nls:partial", (e, t) => cb(t)),
+  onNlsResult: (cb) => ipcRenderer.on("nls:result", (e, t) => cb(t)),
+  onNlsError: (cb) => ipcRenderer.on("nls:error", (e, m) => cb(m)),
+  onNlsCompleted: (cb) => ipcRenderer.on("nls:completed", () => cb())
 });

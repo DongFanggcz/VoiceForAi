@@ -3,6 +3,6 @@ models/
 .cache/
 model/
 model.tar.gz
-src/vosk.js
+config.json
 dist/
 out/

@@ -2,7 +2,7 @@ const { app, BrowserWindow, ipcMain } = require("electron");
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
-const whisper = require("./whisper");
+const nls = require("./nls");
 
 let win = null;
 let server = null;
@@ -143,33 +143,28 @@ ipcMain.handle("window:toggle-top", (event, top) => {
 
 let transcribeInFlight = null;
 
-ipcMain.handle("whisper:load", async (event, modelKey) => {
-  const modelId = await whisper.loadModel(modelKey, (p) => {
-    if (win && p.status === "progress") {
-      win.webContents.send("whisper:progress", p);
-    }
-  });
-  return modelId;
+ipcMain.handle("nls:start", async (event, payload) => {
+  const sampleRate = payload && payload.sampleRate ? payload.sampleRate : 16000;
+  try {
+    const client = await nls.startSession({
+      sampleRate,
+      onPartial: (t) => { if (win) win.webContents.send("nls:partial", t); },
+      onResult: (t) => { if (win) win.webContents.send("nls:result", t); },
+      onError: (e) => { if (win) win.webContents.send("nls:error", e.message); },
+      onCompleted: () => { if (win) win.webContents.send("nls:completed"); }
+    });
+    return { ok: true, taskId: client.taskId };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
 });
 
-ipcMain.handle("whisper:transcribe", async (event, payload) => {
-  if (transcribeInFlight) return transcribeInFlight;
-  transcribeInFlight = (async () => {
-    try {
-      const text = await whisper.transcribe(
-        payload.data,
-        payload.sampleRate,
-        payload.language,
-        (partial) => {
-          if (win) win.webContents.send("whisper:partial", partial);
-        }
-      );
-      return text;
-    } finally {
-      transcribeInFlight = null;
-    }
-  })();
-  return transcribeInFlight;
+ipcMain.on("nls:audio", (event, payload) => {
+  nls.sendAudio(payload.data, payload.sampleRate);
+});
+
+ipcMain.on("nls:stop", () => {
+  nls.stopSession();
 });
 
 app.whenReady().then(async () => {

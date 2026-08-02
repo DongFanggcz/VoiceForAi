@@ -40,6 +40,10 @@
         <span class="slider"></span>
         <span class="switch-label">置顶</span>
       </label>
+      <select id="engine" class="lang-select" title="识别引擎">
+        <option value="aliyun">阿里云（在线）</option>
+        <option value="vosk">本地 vosk（离线）</option>
+      </select>
       <select id="lang" class="lang-select" title="识别语言">
         <option value="zh-CN">普通话</option>
         <option value="zh-TW">中文(繁體)</option>
@@ -53,6 +57,7 @@
     <div id="hint" class="hint"></div>
   </div>
 
+  <script src="vosk.js"></script>
   <script src="renderer.js"></script>
 </body>
 </html>
