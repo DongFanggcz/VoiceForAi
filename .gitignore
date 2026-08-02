@@ -15,5 +15,9 @@ out/
 # 独立项目，不纳入本仓库
 history-timeline/
 
+# 个人开发文件，不上传
+AGENTS.md
+.opencode/
+
 # build artifacts
 build/
