@@ -55,6 +55,7 @@ npm start
 | [需求文档](docs/REQUIREMENTS.md) | 功能需求、非功能需求、架构、优化方向 |
 | [快速上手](docs/QUICKSTART.md) | 一键安装、配置、使用、常见问题 |
 | [测试文档](docs/TESTING.md) | 测试程序说明、测试用例、打包分发 |
+| [复刻提示词](docs/PROMPT.md) | 给 AI 用的提示词，可复刻本项目 |
 
 ## 阿里云 NLS 配置
 
