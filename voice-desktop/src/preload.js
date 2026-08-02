@@ -17,5 +17,6 @@ contextBridge.exposeInMainWorld("desktop", {
   onNlsCompleted: (cb) => ipcRenderer.on("nls:completed", () => cb()),
   onHotkey: (cb) => ipcRenderer.on("hotkey:toggle", () => cb()),
   getHotkey: () => ipcRenderer.invoke("hotkey:get"),
-  setHotkey: (accel) => ipcRenderer.invoke("hotkey:set", accel)
+  setHotkey: (accel) => ipcRenderer.invoke("hotkey:set", accel),
+  copyToClipboard: (text) => ipcRenderer.invoke("clipboard:write", text)
 });

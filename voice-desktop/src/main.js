@@ -234,6 +234,15 @@ ipcMain.on("nls:stop", () => {
 ipcMain.handle("hotkey:get", () => currentHotkey || "CommandOrControl+Shift+V");
 ipcMain.handle("hotkey:set", (event, accel) => registerHotkey(accel));
 
+ipcMain.handle("clipboard:write", (event, text) => {
+  try {
+    require("electron").clipboard.writeText(String(text));
+    return true;
+  } catch (e) {
+    return false;
+  }
+});
+
 app.whenReady().then(async () => {
   if (!app.requestSingleInstanceLock()) {
     app.quit();

@@ -158,7 +158,13 @@
   function copyText(text) {
     if (!text) return;
     var done = function () { showCopied(); };
-    if (navigator.clipboard && navigator.clipboard.writeText) {
+    if (window.desktop.copyToClipboard) {
+      window.desktop.copyToClipboard(text).then(function (ok) {
+        if (ok) { done(); return; }
+        fallbackCopy(text);
+        done();
+      });
+    } else if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(done, function () {
         fallbackCopy(text);
         done();

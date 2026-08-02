@@ -26,7 +26,17 @@
 
 - `voice-desktop/` — Electron 桌面版（当前推荐）
 - `voice-input/` — 网页版浮窗（浏览器 Web Speech API，已弃用）
+- `history-timeline/` — 历史人物时间线（纯网页版，人物时间轴 + 关系连线）
 - `docs/` — 需求文档、快速上手、测试文档
+
+## 历史人物时间线
+
+`history-timeline/` 是一个纯网页版的历史可视化页面：每个人物一条横向时间轴（出生/去世 + 大事记），人物之间用彩色连线表示关系（君臣/兄弟/敌对等），选中或悬停一个人物可高亮其全部关联关系与关联人物。
+
+- 直接双击 `history-timeline/index.html` 打开，无构建步骤
+- 数据在 `history-timeline/js/data.js` 的 `window.HISTORY_DATA`，格式见文件头部注释
+- 事件类型、关系类型配色分别在 `types` / `linkTypes` 中配置，可自行增删
+- 支持搜索过滤、点击人物查看详情、横向滚动浏览
 
 ## 快速开始（桌面版）
 
