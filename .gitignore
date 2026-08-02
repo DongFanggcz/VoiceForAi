@@ -14,3 +14,6 @@ out/
 
 # 独立项目，不纳入本仓库
 history-timeline/
+
+# build artifacts
+build/
