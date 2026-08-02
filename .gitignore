@@ -1,0 +1,13 @@
+# dependencies
+node_modules/
+*.log
+
+# models (large, downloaded separately)
+voice-desktop/models/
+voice-desktop/.cache/
+voice-desktop/model/
+voice-desktop/model.tar.gz
+
+# build output
+dist/
+out/

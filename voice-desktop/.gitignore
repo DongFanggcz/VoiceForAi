@@ -1,0 +1,8 @@
+node_modules/
+models/
+.cache/
+model/
+model.tar.gz
+src/vosk.js
+dist/
+out/

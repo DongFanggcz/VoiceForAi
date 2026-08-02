@@ -1,0 +1,19 @@
+{
+  "name": "voice-desktop",
+  "version": "1.0.0",
+  "description": "语音转文字置顶浮窗",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^43.2.0"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^4.2.0",
+    "opencc-js": "^1.4.1",
+    "vosk-browser": "^0.0.8"
+  }
+}
