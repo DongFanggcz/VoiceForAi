@@ -25,7 +25,6 @@
 ## 项目结构
 
 - `voice-desktop/` — Electron 桌面版（当前推荐）
-- `voice-input/` — 网页版浮窗（浏览器 Web Speech API，已弃用）
 - `docs/` — 需求文档、快速上手、测试文档
 
 ## 快速开始（桌面版）
